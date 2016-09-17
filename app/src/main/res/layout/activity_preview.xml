@@ -14,11 +14,13 @@
         android:layout_height="match_parent"/>
 
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="230sp"
+        android:layout_height="85sp"
+        android:textSize="20sp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:text="PRINT"
+        android:drawableLeft="@drawable/printer"
         android:id="@+id/printButton"/>
 
     <LinearLayout
@@ -28,15 +30,17 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true">
         <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="230sp"
+            android:layout_height="85sp"
+            android:textSize="20sp"
             android:text="STANDARD"
-            android:id="@+id/corporateButton"/>
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="CORPORATE"
             android:id="@+id/standardButton"/>
+        <Button
+            android:layout_width="230sp"
+            android:layout_height="85sp"
+            android:textSize="20sp"
+            android:text="CORPORATE"
+            android:id="@+id/corporateButton"/>
 
     </LinearLayout>
 </RelativeLayout>

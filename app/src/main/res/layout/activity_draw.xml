@@ -16,17 +16,23 @@
         />
 
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="200sp"
+        android:layout_height="85sp"
+        android:textSize="20sp"
         android:id="@+id/saveButton"
-        android:text="Proceed"/>
+        android:text="Proceed"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:drawableLeft="@drawable/tick"/>
 
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="200sp"
+        android:layout_height="85sp"
+        android:textSize="20sp"
         android:id="@+id/refreshButton"
         android:layout_alignParentRight="true"
-        android:text="Refresh"/>
+        android:text="Clear"
+        android:drawableLeft="@drawable/bin"/>
 
 
 

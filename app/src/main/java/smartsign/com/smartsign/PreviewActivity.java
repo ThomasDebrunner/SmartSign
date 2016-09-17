@@ -88,6 +88,7 @@ public class PreviewActivity extends AppCompatActivity {
         corporateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.d("BLAAA", "Setting to TRUE");
                 refreshOutput(true);
                 refreshView();
             }
@@ -114,7 +115,7 @@ public class PreviewActivity extends AppCompatActivity {
         }
 
 
-        refreshOutput(false);
+        refreshOutput(true);
         refreshView();
 
     }

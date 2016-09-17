@@ -1,5 +1,7 @@
 package smartsign.com.smartsign.util;
 
+import android.util.Log;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -17,6 +19,8 @@ public class SignGrabberThread extends Thread {
 
     private boolean finished = false;
 
+    private static final String TAG = "SignGrabberThread";
+
     public SignGrabberThread(File uploadFile, File targetFile, boolean corporate) {
         this.uploadFile = uploadFile;
         this.targetFile = targetFile;
@@ -27,9 +31,15 @@ public class SignGrabberThread extends Thread {
     @Override
     public void run() {
         try {
+
+            if (targetFile.exists()) {
+                targetFile.delete();
+            }
+
             MultipartUtility mpUtility = new MultipartUtility(POST_URL, "US-ASCII");
             mpUtility.addFilePart("file", uploadFile);
             if (corporate) {
+                Log.d(TAG, "Set to TRUE");
                 mpUtility.addFormField("cd", "true");
             }
             else {

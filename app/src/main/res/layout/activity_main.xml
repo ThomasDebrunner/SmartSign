@@ -8,7 +8,8 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:background="@drawable/sky">
     
     <LinearLayout
         android:layout_width="match_parent"
@@ -18,24 +19,20 @@
         android:gravity="center">
 
         <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="710sp"
+            android:layout_height="200sp"
             android:text="Scan Sign"
-            android:id="@+id/scanButton"/>
+            android:id="@+id/scanButton"
+            android:textSize="32sp"
+            android:drawableLeft="@drawable/scanner"/>
 
         <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="710sp"
+            android:layout_height="200sp"
+            android:textSize="32sp"
             android:text="Draw Sign"
-            android:id="@+id/drawButton"/>
+            android:id="@+id/drawButton"
+            android:drawableLeft="@drawable/pen"/>
 
     </LinearLayout>
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Print document"
-        android:id="@+id/printButton"
-        android:layout_alignParentBottom="true"/>
-
-
  </RelativeLayout>
