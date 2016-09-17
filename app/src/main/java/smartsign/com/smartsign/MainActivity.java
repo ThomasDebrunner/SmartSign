@@ -49,42 +49,9 @@ public class MainActivity extends AppCompatActivity {
         String fullFileName = Environment.getExternalStorageDirectory().getPath() + "/" + fileName;
         File inputFile = new File(fullFileName);
 
-
-        File outputFile = null;
-
-        // upload
-        try {
-            progressDialog = new ProgressDialog(this);
-            progressDialog.setTitle("Processing");
-            progressDialog.setMessage("Please wait...");
-            progressDialog.show();
-
-
-            outputFile = File.createTempFile("result_", ".pdf", Environment.getExternalStorageDirectory());
-
-            SignGrabberThread signGrabberThread = new SignGrabberThread(inputFile, outputFile);
-            signGrabberThread.start();
-
-            while(!signGrabberThread.isFinished());
-
-            progressDialog.hide();
-
-
-        } catch (IOException e) {
-            e.printStackTrace();
-
-        }
-
-        // set output to input, if we have no output
-        if (outputFile == null) {
-            outputFile = inputFile;
-        }
-
-
         // switch activity.
         Intent intent = new Intent(this, PreviewActivity.class);
-        intent.putExtra("RESULT_FILENAME", outputFile.getAbsolutePath());
-        intent.putExtra("INPUT_FILENAME", inputFile.getAbsolutePath());
+        intent.putExtra("INFILE_NAME", inputFile.getAbsolutePath());
 
         startActivity(intent);
     }

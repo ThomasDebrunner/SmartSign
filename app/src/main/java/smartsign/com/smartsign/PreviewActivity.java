@@ -32,58 +32,26 @@ public class PreviewActivity extends AppCompatActivity {
     private File outFile;
 
 
-    private void refreshOutput(int style) {
+    private void refreshOutput() {
+        Log.d(TAG, "uploadAndContinue called. Try to upload stuff and get result");
+
+
         // upload
-        try {
-            progressDialog = new ProgressDialog(this);
-            progressDialog.setTitle("Processing");
-            progressDialog.setMessage("Please wait...");
-            progressDialog.show();
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setTitle("Processing");
+        progressDialog.setMessage("Please wait...");
+        progressDialog.show();
 
+        SignGrabberThread signGrabberThread = new SignGrabberThread(inFile, outFile);
+        signGrabberThread.start();
 
-            outFile = File.createTempFile("result_", ".pdf", Environment.getExternalStorageDirectory());
+        while(!signGrabberThread.isFinished());
 
-            SignGrabberThread signGrabberThread = new SignGrabberThread(inFile, outFile);
-            signGrabberThread.start();
-
-            while(!signGrabberThread.isFinished());
-
-            progressDialog.hide();
-
-
-        } catch (IOException e) {
-            e.printStackTrace();
-
-        }
-
-        // set output to input, if we have no output
-        if (outFile == null) {
-            outFile = inFile;
-        }
-
+        progressDialog.hide();
     }
 
 
-
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        printObserver = new PrintObserver(new Handler(), PreviewActivity.this);
-
-
-        setContentView(R.layout.activity_preview);
-
-        pdfView = (PDFView)findViewById(R.id.pdfView);
-        printButton = (Button)findViewById(R.id.printButton);
-
-
-        Intent intent = getIntent();
-        String fullFileName = intent.getStringExtra("RESULT_FILENAME");
-        Log.d(TAG, fullFileName);
-
-        outFile = new File(fullFileName);
+    private void refreshView() {
         if(outFile.exists()) {
             pdfView.fromFile(outFile).pages(0).enableSwipe(false).load();
         }
@@ -91,6 +59,17 @@ public class PreviewActivity extends AppCompatActivity {
             Log.d(TAG, String.format("PDF file %s does not exist", outFile.getAbsolutePath()));
         }
 
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        printObserver = new PrintObserver(new Handler(), PreviewActivity.this);
+        setContentView(R.layout.activity_preview);
+
+        pdfView = (PDFView)findViewById(R.id.pdfView);
+        printButton = (Button)findViewById(R.id.printButton);
 
         printButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -100,6 +79,21 @@ public class PreviewActivity extends AppCompatActivity {
             }
         });
 
+        Intent intent = getIntent();
+        inFile = new File(intent.getStringExtra("INFILE_NAME"));
+
+        Log.d(TAG, inFile.getAbsolutePath());
+
+
+        try {
+            outFile = File.createTempFile("result_", ".pdf", Environment.getExternalStorageDirectory());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        refreshOutput();
+        refreshView();
 
     }
 
