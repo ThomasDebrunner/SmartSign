@@ -24,6 +24,9 @@ public class PreviewActivity extends AppCompatActivity {
     private PDFView pdfView;
 
     private Button printButton;
+    private Button standardButton;
+    private Button corporateButton;
+
     private PrintObserver printObserver;
 
     private ProgressDialog progressDialog;
@@ -32,7 +35,7 @@ public class PreviewActivity extends AppCompatActivity {
     private File outFile;
 
 
-    private void refreshOutput() {
+    private void refreshOutput(boolean corporate) {
         Log.d(TAG, "uploadAndContinue called. Try to upload stuff and get result");
 
 
@@ -42,7 +45,7 @@ public class PreviewActivity extends AppCompatActivity {
         progressDialog.setMessage("Please wait...");
         progressDialog.show();
 
-        SignGrabberThread signGrabberThread = new SignGrabberThread(inFile, outFile);
+        SignGrabberThread signGrabberThread = new SignGrabberThread(inFile, outFile, corporate);
         signGrabberThread.start();
 
         while(!signGrabberThread.isFinished());
@@ -70,6 +73,25 @@ public class PreviewActivity extends AppCompatActivity {
 
         pdfView = (PDFView)findViewById(R.id.pdfView);
         printButton = (Button)findViewById(R.id.printButton);
+        standardButton = (Button)findViewById(R.id.standardButton);
+        corporateButton = (Button)findViewById(R.id.corporateButton);
+
+        standardButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                refreshOutput(false);
+                refreshView();
+            }
+        });
+
+
+        corporateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                refreshOutput(true);
+                refreshView();
+            }
+        });
 
         printButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -92,7 +114,7 @@ public class PreviewActivity extends AppCompatActivity {
         }
 
 
-        refreshOutput();
+        refreshOutput(false);
         refreshView();
 
     }

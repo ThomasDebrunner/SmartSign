@@ -13,12 +13,14 @@ public class SignGrabberThread extends Thread {
 
     private File uploadFile;
     private File targetFile;
+    private boolean corporate;
 
     private boolean finished = false;
 
-    public SignGrabberThread(File uploadFile, File targetFile) {
+    public SignGrabberThread(File uploadFile, File targetFile, boolean corporate) {
         this.uploadFile = uploadFile;
         this.targetFile = targetFile;
+        this.corporate = corporate;
     }
 
 
@@ -27,6 +29,12 @@ public class SignGrabberThread extends Thread {
         try {
             MultipartUtility mpUtility = new MultipartUtility(POST_URL, "US-ASCII");
             mpUtility.addFilePart("file", uploadFile);
+            if (corporate) {
+                mpUtility.addFormField("cd", "true");
+            }
+            else {
+                mpUtility.addFormField("cd", "false");
+            }
             mpUtility.downloadResponse(targetFile);
             finished = true;
         }
