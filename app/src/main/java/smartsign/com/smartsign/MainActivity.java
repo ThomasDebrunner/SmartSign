@@ -1,5 +1,6 @@
 package smartsign.com.smartsign;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
@@ -9,8 +10,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.samsung.android.sdk.SsdkUnsupportedException;
 import com.sec.android.ngen.common.lib.ssp.DeviceNotReadyException;
@@ -18,7 +17,6 @@ import com.sec.android.ngen.common.lib.ssp.Ssp;
 
 import smartsign.com.smartsign.async.PrintAsyncTask;
 import smartsign.com.smartsign.async.ScanAsyncTask;
-import smartsign.com.smartsign.async.ScanCapsReaderTask;
 import smartsign.com.smartsign.observer.PrintObserver;
 import smartsign.com.smartsign.observer.ScanObserver;
 
@@ -26,15 +24,30 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
 
-    private PrintObserver printObserver;
     private ScanObserver scanObserver;
 
-    private Button scannerPropsButton;
     private Button printButton;
     private Button scanButton;
-    public TextView scannerPropsTextView;
 
     private SharedPreferences mPrefs = null;
+
+    public interface ScanFinishedHandler {
+        void scanFinished(String fileName);
+    }
+
+    private void uploadAndContinue(String fileName) {
+        Log.d(TAG, "uploadAndContinue called. Try to upload stuff and get result");
+
+        /**
+         * UPLOAD CODE GOES HERE.
+         */
+
+
+        // switch activity.
+        Intent intent = new Intent(this, PreviewActivity.class);
+        intent.putExtra("RESULT_FILENAME", fileName);
+        startActivity(intent);
+    }
 
 
     @Override
@@ -55,7 +68,6 @@ public class MainActivity extends AppCompatActivity {
         catch (final DeviceNotReadyException e) { Log.e(TAG, "Device not ready yet, finish"); finish();
         }
 
-        printObserver.register(getApplicationContext());
         scanObserver.register(getApplicationContext());
     }
 
@@ -63,31 +75,17 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        printObserver = new PrintObserver(new Handler(), MainActivity.this);
-        scanObserver = new ScanObserver(new Handler(), MainActivity.this);
+        scanObserver = new ScanObserver(new Handler(), MainActivity.this, new ScanFinishedHandler() {
+            @Override
+            public void scanFinished(String fileName) {
+                uploadAndContinue(fileName);
+            }
+        });
 
         setContentView(R.layout.activity_main);
 
-        scannerPropsTextView = (TextView)findViewById(R.id.scannerPropsTextView);
-        scannerPropsButton = (Button)findViewById(R.id.scannerPropsButton);
-        printButton = (Button)findViewById(R.id.printButton);
         scanButton = (Button)findViewById(R.id.scanButton);
 
-        scannerPropsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                new ScanCapsReaderTask(MainActivity.this,  MainActivity.this).execute((Void)null);
-            }
-        });
-
-
-        printButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Pass application context
-                new PrintAsyncTask(getApplicationContext(), printObserver).execute();
-            }
-        });
 
         scanButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -102,7 +100,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        printObserver.unregister(getApplicationContext());
         scanObserver.unregister(getApplicationContext());
     }
 

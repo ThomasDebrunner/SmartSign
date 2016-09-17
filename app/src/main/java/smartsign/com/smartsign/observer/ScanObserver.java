@@ -5,6 +5,7 @@ package smartsign.com.smartsign.observer;
  */
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -18,6 +19,9 @@ import com.sec.android.ngen.common.lib.ssp.scanner.ScannerService;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Callable;
+
+import smartsign.com.smartsign.MainActivity;
 
 /**
  * Observer for submitted Scan operation
@@ -28,14 +32,19 @@ public class ScanObserver extends ScannerService.AbstractScanletObserver {
 
     private Activity activity;
 
+    private ProgressDialog progressDialog;
+
+    private MainActivity.ScanFinishedHandler scanFinishedHandler;
+
     /**
      * Default constructor.
      *
      * @param handler {@link android.os.Handler} to launch observer on
      */
-    public ScanObserver(final Handler handler, Activity activity) {
+    public ScanObserver(final Handler handler, Activity activity, MainActivity.ScanFinishedHandler scanFinishedHandler) {
         super(handler);
         this.activity = activity;
+        this.scanFinishedHandler = scanFinishedHandler;
     }
 
     private void showToast(final String text) {
@@ -55,6 +64,16 @@ public class ScanObserver extends ScannerService.AbstractScanletObserver {
 
             Log.d(TAG, "Received jobID as " + jobId);
             showToast("Job Id " + jobId);
+
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    progressDialog = new ProgressDialog(activity);
+                    progressDialog.setTitle("Scanning");
+                    progressDialog.setMessage("Please wait...");
+                    progressDialog.show();
+                }
+            });
         }
     }
 
@@ -62,11 +81,14 @@ public class ScanObserver extends ScannerService.AbstractScanletObserver {
     public void onCancel(final String rid) {
         Log.d(TAG, "Received Scan Cancel");
         showToast("Scan cancelled!");
+
+        progressDialog.dismiss();
     }
 
     @Override
     public void onComplete(final String rid, final Bundle bundle) {
         Log.d(TAG, "Task completed. ");
+        progressDialog.dismiss();
 
         final ArrayList<String> images = bundle.getStringArrayList(Scanlet.Keys.KEY_FILENAME_LIST);
 
@@ -74,12 +96,17 @@ public class ScanObserver extends ScannerService.AbstractScanletObserver {
             Log.d(TAG, Arrays.toString(images.toArray()));
             showToast("Images: " + Arrays.toString(images.toArray()));
         }
+
+        if (scanFinishedHandler != null && images != null && images.size() > 0) {
+            scanFinishedHandler.scanFinished(images.get(0));
+        }
     }
 
     @Override
     public void onFail(final String rid, final Result result) {
         Log.e(TAG, result.toString());
         showToast("Failed: " + result);
+        progressDialog.dismiss();
 
         if (result.mCode == Result.RESULT_WS_FAILURE) {
             final Result.WSCause cause = Result.getWSCause(result);

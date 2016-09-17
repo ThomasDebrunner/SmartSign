@@ -27,8 +27,6 @@ import smartsign.com.smartsign.observer.PrintObserver;
  */
 public class PrintAsyncTask extends AsyncTask<Void, Void, Void> {
 
-    private static final String FILEPATH = Environment.getExternalStorageDirectory().getPath() + "/hipsum.pdf";
-
     private static final String TAG = "PrintAsyncTask";
 
     /**
@@ -43,15 +41,19 @@ public class PrintAsyncTask extends AsyncTask<Void, Void, Void> {
      * Preferences to obtain Print Settings
      */
     private final SharedPreferences prefs;
+
+
+    private File file;
     /**
      * Error Message string to provide to the user
      */
     private String errorMsg = null;
 
-    public PrintAsyncTask(final Context context, final PrintObserver observer) {
+    public PrintAsyncTask(final Context context, final PrintObserver observer, File file) {
         this.observer = new WeakReference<>(observer);
         this.context = context;
         this.prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+        this.file = file;
     }
 
     @Override
@@ -78,11 +80,11 @@ public class PrintAsyncTask extends AsyncTask<Void, Void, Void> {
 
         try {
 
-            Log.i(TAG, "Selected path: " + FILEPATH);
+            Log.i(TAG, "Selected path: " + file.getAbsolutePath());
 
             // Build PrintAttributes based on preferences values
             final PrintAttributes attributes =
-                    new PrintAttributes.PrintFromStorageBuilder(Uri.fromFile(new File(FILEPATH)))
+                    new PrintAttributes.PrintFromStorageBuilder(Uri.fromFile(file))
                             .setColorMode(ColorMode.DEFAULT)
                             .setDuplex(Duplex.DEFAULT)
                             .setAutoFit(AutoFit.DEFAULT)
