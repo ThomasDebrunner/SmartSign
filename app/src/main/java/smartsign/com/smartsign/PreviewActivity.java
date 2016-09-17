@@ -1,5 +1,6 @@
 package smartsign.com.smartsign;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Environment;
 import android.os.Handler;
@@ -12,9 +13,11 @@ import android.widget.Button;
 import com.github.barteksc.pdfviewer.PDFView;
 
 import java.io.File;
+import java.io.IOException;
 
 import smartsign.com.smartsign.async.PrintAsyncTask;
 import smartsign.com.smartsign.observer.PrintObserver;
+import smartsign.com.smartsign.util.SignGrabberThread;
 
 public class PreviewActivity extends AppCompatActivity {
     private static final String TAG = "PreviewActivity";
@@ -23,7 +26,45 @@ public class PreviewActivity extends AppCompatActivity {
     private Button printButton;
     private PrintObserver printObserver;
 
-    private File pdfFile;
+    private ProgressDialog progressDialog;
+
+    private File inFile;
+    private File outFile;
+
+
+    private void refreshOutput(int style) {
+        // upload
+        try {
+            progressDialog = new ProgressDialog(this);
+            progressDialog.setTitle("Processing");
+            progressDialog.setMessage("Please wait...");
+            progressDialog.show();
+
+
+            outFile = File.createTempFile("result_", ".pdf", Environment.getExternalStorageDirectory());
+
+            SignGrabberThread signGrabberThread = new SignGrabberThread(inFile, outFile);
+            signGrabberThread.start();
+
+            while(!signGrabberThread.isFinished());
+
+            progressDialog.hide();
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+
+        }
+
+        // set output to input, if we have no output
+        if (outFile == null) {
+            outFile = inFile;
+        }
+
+    }
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,12 +83,12 @@ public class PreviewActivity extends AppCompatActivity {
         String fullFileName = intent.getStringExtra("RESULT_FILENAME");
         Log.d(TAG, fullFileName);
 
-        pdfFile = new File(fullFileName);
-        if(pdfFile.exists()) {
-            pdfView.fromFile(pdfFile).pages(0).enableSwipe(false).load();
+        outFile = new File(fullFileName);
+        if(outFile.exists()) {
+            pdfView.fromFile(outFile).pages(0).enableSwipe(false).load();
         }
         else {
-            Log.d(TAG, String.format("PDF file %s does not exist", pdfFile.getAbsolutePath()));
+            Log.d(TAG, String.format("PDF file %s does not exist", outFile.getAbsolutePath()));
         }
 
 
@@ -55,7 +96,7 @@ public class PreviewActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // Pass application context
-                new PrintAsyncTask(getApplicationContext(), printObserver, pdfFile).execute();
+                new PrintAsyncTask(getApplicationContext(), printObserver, outFile).execute();
             }
         });
 

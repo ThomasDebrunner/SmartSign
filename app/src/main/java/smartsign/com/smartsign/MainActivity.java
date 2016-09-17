@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
             progressDialog.show();
 
 
-            outputFile = File.createTempFile("result_", ".pdf", this.getCacheDir());
+            outputFile = File.createTempFile("result_", ".pdf", Environment.getExternalStorageDirectory());
 
             SignGrabberThread signGrabberThread = new SignGrabberThread(inputFile, outputFile);
             signGrabberThread.start();
@@ -84,6 +84,8 @@ public class MainActivity extends AppCompatActivity {
         // switch activity.
         Intent intent = new Intent(this, PreviewActivity.class);
         intent.putExtra("RESULT_FILENAME", outputFile.getAbsolutePath());
+        intent.putExtra("INPUT_FILENAME", inputFile.getAbsolutePath());
+
         startActivity(intent);
     }
 
