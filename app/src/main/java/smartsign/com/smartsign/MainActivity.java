@@ -61,7 +61,6 @@ public class MainActivity extends AppCompatActivity {
 
 
             outputFile = File.createTempFile("result_", ".pdf", this.getCacheDir());
-            outputFile = new File("/mnt/sdcard/out.png");
 
             SignGrabberThread signGrabberThread = new SignGrabberThread(inputFile, outputFile);
             signGrabberThread.start();
