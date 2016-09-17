@@ -39,7 +39,7 @@ public class PreviewActivity extends AppCompatActivity {
 
 
         Intent intent = getIntent();
-        String fullFileName = Environment.getExternalStorageDirectory().getPath() + "/" + intent.getStringExtra("RESULT_FILENAME");
+        String fullFileName = intent.getStringExtra("RESULT_FILENAME");
         Log.d(TAG, fullFileName);
 
         pdfFile = new File(fullFileName);

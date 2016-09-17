@@ -1,8 +1,10 @@
 package smartsign.com.smartsign;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -15,10 +17,14 @@ import com.samsung.android.sdk.SsdkUnsupportedException;
 import com.sec.android.ngen.common.lib.ssp.DeviceNotReadyException;
 import com.sec.android.ngen.common.lib.ssp.Ssp;
 
+import java.io.File;
+import java.io.IOException;
+
 import smartsign.com.smartsign.async.PrintAsyncTask;
 import smartsign.com.smartsign.async.ScanAsyncTask;
 import smartsign.com.smartsign.observer.PrintObserver;
 import smartsign.com.smartsign.observer.ScanObserver;
+import smartsign.com.smartsign.util.SignGrabberThread;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -29,6 +35,8 @@ public class MainActivity extends AppCompatActivity {
     private Button printButton;
     private Button scanButton;
 
+    private ProgressDialog progressDialog;
+
     private SharedPreferences mPrefs = null;
 
     public interface ScanFinishedHandler {
@@ -38,14 +46,45 @@ public class MainActivity extends AppCompatActivity {
     private void uploadAndContinue(String fileName) {
         Log.d(TAG, "uploadAndContinue called. Try to upload stuff and get result");
 
-        /**
-         * UPLOAD CODE GOES HERE.
-         */
+        String fullFileName = Environment.getExternalStorageDirectory().getPath() + "/" + fileName;
+        File inputFile = new File(fullFileName);
+
+
+        File outputFile = null;
+
+        // upload
+        try {
+            progressDialog = new ProgressDialog(this);
+            progressDialog.setTitle("Processing");
+            progressDialog.setMessage("Please wait...");
+            progressDialog.show();
+
+
+            outputFile = File.createTempFile("result_", ".pdf", this.getCacheDir());
+            outputFile = new File("/mnt/sdcard/out.png");
+
+            SignGrabberThread signGrabberThread = new SignGrabberThread(inputFile, outputFile);
+            signGrabberThread.start();
+
+            while(!signGrabberThread.isFinished());
+
+            progressDialog.hide();
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+
+        }
+
+        // set output to input, if we have no output
+        if (outputFile == null) {
+            outputFile = inputFile;
+        }
 
 
         // switch activity.
         Intent intent = new Intent(this, PreviewActivity.class);
-        intent.putExtra("RESULT_FILENAME", fileName);
+        intent.putExtra("RESULT_FILENAME", outputFile.getAbsolutePath());
         startActivity(intent);
     }
 
