@@ -167,7 +167,7 @@ public class PreviewActivity extends AppCompatActivity {
         }
 
 
-        refreshOutput(true);
+        refreshOutput(false);
         refreshView();
 
     }
