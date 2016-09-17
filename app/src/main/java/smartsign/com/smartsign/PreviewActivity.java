@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.github.barteksc.pdfviewer.PDFView;
 
@@ -101,6 +102,13 @@ public class PreviewActivity extends AppCompatActivity {
         printButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                if(!outFile.exists()) {
+                    Toast.makeText(PreviewActivity.this, "There is nothing to print", Toast.LENGTH_SHORT);
+                    return;
+                }
+
+
                 AlertDialog.Builder builder = new AlertDialog.Builder(PreviewActivity.this);
                 builder.setTitle("Copies");
 
