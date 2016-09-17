@@ -32,8 +32,8 @@ public class MainActivity extends AppCompatActivity {
 
     private ScanObserver scanObserver;
 
-    private Button printButton;
     private Button scanButton;
+    private Button drawButton;
 
     private ProgressDialog progressDialog;
 
@@ -131,6 +131,18 @@ public class MainActivity extends AppCompatActivity {
                 new ScanAsyncTask(getApplicationContext()).execute();
             }
         });
+
+        drawButton = (Button)findViewById(R.id.drawButton);
+
+        drawButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, DrawActivity.class);
+                startActivity(intent);
+            }
+        });
+
+
 
     }
 

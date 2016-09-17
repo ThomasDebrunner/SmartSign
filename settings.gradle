@@ -1,1 +1,1 @@
-include ':app', ':SSPLib'
+include ':app', ':SSPLib', ':drawingboard'
