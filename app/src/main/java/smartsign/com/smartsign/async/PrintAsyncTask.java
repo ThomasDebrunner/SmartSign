@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -26,7 +27,7 @@ import smartsign.com.smartsign.observer.PrintObserver;
  */
 public class PrintAsyncTask extends AsyncTask<Void, Void, Void> {
 
-    private static final String FILEPATH = "test.pdf";
+    private static final String FILEPATH = Environment.getExternalStorageDirectory().getPath() + "/hipsum.pdf";
 
     private static final String TAG = "PrintAsyncTask";
 
@@ -47,7 +48,7 @@ public class PrintAsyncTask extends AsyncTask<Void, Void, Void> {
      */
     private String errorMsg = null;
 
-    PrintAsyncTask(final Context context, final PrintObserver observer) {
+    public PrintAsyncTask(final Context context, final PrintObserver observer) {
         this.observer = new WeakReference<>(observer);
         this.context = context;
         this.prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());

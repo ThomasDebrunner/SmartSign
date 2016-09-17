@@ -2,6 +2,7 @@ package smartsign.com.smartsign;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -15,14 +16,22 @@ import com.samsung.android.sdk.SsdkUnsupportedException;
 import com.sec.android.ngen.common.lib.ssp.DeviceNotReadyException;
 import com.sec.android.ngen.common.lib.ssp.Ssp;
 
+import smartsign.com.smartsign.async.PrintAsyncTask;
+import smartsign.com.smartsign.async.ScanAsyncTask;
 import smartsign.com.smartsign.async.ScanCapsReaderTask;
+import smartsign.com.smartsign.observer.PrintObserver;
+import smartsign.com.smartsign.observer.ScanObserver;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
 
+    private PrintObserver printObserver;
+    private ScanObserver scanObserver;
+
     private Button scannerPropsButton;
     private Button printButton;
+    private Button scanButton;
     public TextView scannerPropsTextView;
 
     private SharedPreferences mPrefs = null;
@@ -46,16 +55,23 @@ public class MainActivity extends AppCompatActivity {
         catch (final DeviceNotReadyException e) { Log.e(TAG, "Device not ready yet, finish"); finish();
         }
 
+        printObserver.register(getApplicationContext());
+        scanObserver.register(getApplicationContext());
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        printObserver = new PrintObserver(new Handler(), MainActivity.this);
+        scanObserver = new ScanObserver(new Handler(), MainActivity.this);
+
         setContentView(R.layout.activity_main);
 
         scannerPropsTextView = (TextView)findViewById(R.id.scannerPropsTextView);
         scannerPropsButton = (Button)findViewById(R.id.scannerPropsButton);
         printButton = (Button)findViewById(R.id.printButton);
+        scanButton = (Button)findViewById(R.id.scanButton);
 
         scannerPropsButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -64,6 +80,30 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+        printButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Pass application context
+                new PrintAsyncTask(getApplicationContext(), printObserver).execute();
+            }
+        });
+
+        scanButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new ScanAsyncTask(getApplicationContext()).execute();
+            }
+        });
+
+    }
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        printObserver.unregister(getApplicationContext());
+        scanObserver.unregister(getApplicationContext());
     }
 
     @Override
