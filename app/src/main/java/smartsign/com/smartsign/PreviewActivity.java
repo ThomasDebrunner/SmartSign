@@ -1,14 +1,18 @@
 package smartsign.com.smartsign;
 
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Environment;
 import android.os.Handler;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 
 import com.github.barteksc.pdfviewer.PDFView;
 
@@ -97,8 +101,48 @@ public class PreviewActivity extends AppCompatActivity {
         printButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Pass application context
-                new PrintAsyncTask(getApplicationContext(), printObserver, outFile).execute();
+                AlertDialog.Builder builder = new AlertDialog.Builder(PreviewActivity.this);
+                builder.setTitle("Copies");
+
+                final EditText input = new EditText(PreviewActivity.this);
+                input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                builder.setView(input);
+
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        int copies = 1;
+                        String inp = input.getText().toString();
+
+                        try {
+                            copies = Integer.parseInt(inp);
+                        } catch(NumberFormatException e) {
+                            copies = 1;
+                        }
+
+                        // save the enviromnent
+                        if (copies > 5) {
+                            copies = 5;
+                        }
+
+
+                        // start printing
+                        new PrintAsyncTask(getApplicationContext(), printObserver, outFile, copies).execute();
+
+                        dialog.dismiss();
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                builder.show();
+
+
             }
         });
 

@@ -42,6 +42,7 @@ public class PrintAsyncTask extends AsyncTask<Void, Void, Void> {
      */
     private final SharedPreferences prefs;
 
+    private int copies;
 
     private File file;
     /**
@@ -49,11 +50,12 @@ public class PrintAsyncTask extends AsyncTask<Void, Void, Void> {
      */
     private String errorMsg = null;
 
-    public PrintAsyncTask(final Context context, final PrintObserver observer, File file) {
+    public PrintAsyncTask(final Context context, final PrintObserver observer, File file, int copies) {
         this.observer = new WeakReference<>(observer);
         this.context = context;
         this.prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
         this.file = file;
+        this.copies = copies;
     }
 
     @Override
@@ -88,7 +90,7 @@ public class PrintAsyncTask extends AsyncTask<Void, Void, Void> {
                             .setColorMode(ColorMode.DEFAULT)
                             .setDuplex(Duplex.DEFAULT)
                             .setAutoFit(AutoFit.DEFAULT)
-                            .setCopies(1)
+                            .setCopies(copies)
                             .build(caps);
 
             // Clean stored job id if any
