@@ -25,9 +25,6 @@ public class DrawActivity extends AppCompatActivity {
         setContentView(R.layout.activity_draw);
 
 
-
-        setContentView(R.layout.activity_main);
-
         drawingBoard = (DrawingBoard) findViewById(R.id.drawingBoard);
 
         drawingBoard.setPenColor(R.color.colorPrimaryDark);
